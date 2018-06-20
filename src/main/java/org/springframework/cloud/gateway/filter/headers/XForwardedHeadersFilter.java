@@ -198,6 +198,13 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		String prefix = request.getURI().getPath();
 		System.out.println("XForwardedHeadersFilter - path : "+request.getURI().getPath());
 		System.out.println("XForwardedHeadersFilter - rawpath : "+request.getURI().getRawPath());
+		System.out.println("XForwardedHeadersFilter - remoteAddress : "+request.getRemoteAddress());
+		System.out.println("XForwardedHeadersFilter - headers : "+request.getHeaders());
+		for(String key : request.getHeaders().keySet()){
+			System.out.println("XForwardedHeadersFilter - header : "+request.getHeaders().get(key));
+		}
+		System.out.println("XForwardedHeadersFilter - rawSchemeSpecificPart : "+request.getURI().getRawSchemeSpecificPart());
+		System.out.println("XForwardedHeadersFilter - remoteAddress.address : "+request.getRemoteAddress().getAddress());
 
 		if(isPrefixEnabled()){
 			write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());

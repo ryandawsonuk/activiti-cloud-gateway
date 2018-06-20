@@ -3,16 +3,19 @@ package org.springframework.cloud.gateway.filter.headers;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
+
 @ConfigurationProperties("spring.cloud.gateway.x-forwarded")
 public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
     /** default http port */
-    public static final int HTTP_PORT = 80;
+	public static final int HTTP_PORT = 80;
 
 	/** default https port */
 	public static final int HTTPS_PORT = 443;
@@ -75,7 +78,7 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 	private boolean protoAppend = true;
 
 	/** If appending X-Forwarded-Prefix as a list is enabled. */
-	private boolean prefixAppend = true;
+	private boolean prefixAppend = false;
 
 	@Override
 	public int getOrder() {
@@ -176,6 +179,8 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 
 	@Override
 	public HttpHeaders filter(HttpHeaders input, ServerWebExchange exchange) {
+		Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+
 		ServerHttpRequest request = exchange.getRequest();
 		HttpHeaders original = input;
 		HttpHeaders updated = new HttpHeaders();
@@ -199,15 +204,19 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		}
 
 		if(isPrefixEnabled()){
-			String prefix = null;
+			String prefix = route.getId();
+
+			System.out.println("XForwardedHeadersFilter - route: "+route);
+
+			System.out.println("XForwardedHeadersFilter - route id: "+route.getId());
+			System.out.println("XForwardedHeadersFilter - route predicate: "+route.getPredicate());
+			System.out.println("XForwardedHeadersFilter - route uri: "+route.getUri());
+
 
 			if (request.getHeaders().containsKey(X_FORWARDED_PREFIX_HEADER)){
-				prefix = request.getHeaders().get(X_FORWARDED_PREFIX_HEADER).get(0);
+				prefix = request.getHeaders().getFirst(X_FORWARDED_PREFIX_HEADER);
 			}
-			else if(request.getHeaders().containsKey(X_ORIGINAL_URI)){
-				String originalUri = request.getHeaders().get(X_ORIGINAL_URI).get(0);
-				prefix = originalUri.replace(request.getURI().getPath(),"");
-			}
+
 			write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
 		}
 

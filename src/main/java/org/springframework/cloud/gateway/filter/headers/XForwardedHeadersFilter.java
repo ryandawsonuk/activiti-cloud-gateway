@@ -198,25 +198,15 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			write(updated, X_FORWARDED_PROTO_HEADER, proto, isProtoAppend());
 		}
 
-		System.out.println("XForwardedHeadersFilter - path : "+request.getURI().getPath());
-		System.out.println("XForwardedHeadersFilter - rawpath : "+request.getURI().getRawPath());
-		System.out.println("XForwardedHeadersFilter - remoteAddress : "+request.getRemoteAddress());
-		System.out.println("XForwardedHeadersFilter - headers : "+request.getHeaders());
-		for(String key : request.getHeaders().keySet()){
-			System.out.println("XForwardedHeadersFilter - header : "+request.getHeaders().get(key));
-		}
-		System.out.println("XForwardedHeadersFilter - rawSchemeSpecificPart : "+request.getURI().getRawSchemeSpecificPart());
-		System.out.println("XForwardedHeadersFilter - remoteAddress.address : "+request.getRemoteAddress().getAddress());
-
 		if(isPrefixEnabled()){
 			String prefix = null;
+
 			if (request.getHeaders().containsKey(X_FORWARDED_PREFIX_HEADER)){
 				prefix = request.getHeaders().get(X_FORWARDED_PREFIX_HEADER).get(0);
-			} else if(request.getHeaders().containsKey(X_ORIGINAL_URI)){
+			}
+			else if(request.getHeaders().containsKey(X_ORIGINAL_URI)){
 				String originalUri = request.getHeaders().get(X_ORIGINAL_URI).get(0);
-				System.out.println("XForwardedHeadersFilter - originalUri: "+ originalUri);
-				prefix = originalUri.replace(request.getURI().getRawPath(),"");
-				System.out.println("XForwardedHeadersFilter - calculated prefix: "+ prefix);
+				prefix = originalUri.replace(request.getURI().getPath(),"");
 			}
 			write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
 		}

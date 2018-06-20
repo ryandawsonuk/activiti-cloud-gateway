@@ -3,6 +3,7 @@ package org.springframework.cloud.gateway.filter.headers;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
@@ -182,10 +183,6 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
 
 
-		for(String key : exchange.getAttributes().keySet()){
-			System.out.println("Exchange attribute: " + key+" - "+ (String)exchange.getAttribute(key));
-		}
-
 		ServerHttpRequest request = exchange.getRequest();
 		HttpHeaders original = input;
 		HttpHeaders updated = new HttpHeaders();
@@ -219,10 +216,24 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			System.out.println("XForwardedHeadersFilter - route id: "+route.getId());
 			System.out.println("XForwardedHeadersFilter - route predicate: "+route.getPredicate());
 			System.out.println("XForwardedHeadersFilter - route uri: "+route.getUri());
+			System.out.println("XForwardedHeadersFilter - route uri path: "+route.getUri().getPath());
+			System.out.println("XForwardedHeadersFilter - route uri scheme specific part: "+route.getUri().getSchemeSpecificPart());
+			System.out.println("XForwardedHeadersFilter - route uri scheme : "+route.getUri().getScheme());
+			System.out.println("XForwardedHeadersFilter - route uri fragment : "+route.getUri().getFragment());
 
+			for(GatewayFilter filter : route.getFilters()){
+				System.out.println("filter class "+filter.getClass() +" " + filter);
+				System.out.println("filter shortcut prefix "+ filter.shortcutFieldPrefix());
+				System.out.println("filter shortcutfieldorder  "+ filter.shortcutFieldOrder());
+				System.out.println("filter shortcuttype  "+ filter.shortcutType());
+			}
 
 			if (request.getHeaders().containsKey(X_FORWARDED_PREFIX_HEADER)){
 				prefix = request.getHeaders().getFirst(X_FORWARDED_PREFIX_HEADER);
+			}
+
+			for(String key : exchange.getAttributes().keySet()){
+				System.out.println("Exchange attribute: " + key+" - "+ (Object)exchange.getAttribute(key));
 			}
 
 			write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());

@@ -204,7 +204,10 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		}
 
 		if(isPrefixEnabled()){
-			String prefix = route.getId();
+			String prefix = null;
+			if (route != null){
+				prefix = route.getId();
+			}
 
 			System.out.println("XForwardedHeadersFilter - route: "+route);
 

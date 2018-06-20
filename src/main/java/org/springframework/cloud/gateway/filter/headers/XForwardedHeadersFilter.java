@@ -181,6 +181,11 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 	public HttpHeaders filter(HttpHeaders input, ServerWebExchange exchange) {
 		Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
 
+
+		for(String key : exchange.getAttributes().keySet()){
+			System.out.println("Exchange attribute: " + key+" - "+ (String)exchange.getAttribute(key));
+		}
+
 		ServerHttpRequest request = exchange.getRequest();
 		HttpHeaders original = input;
 		HttpHeaders updated = new HttpHeaders();

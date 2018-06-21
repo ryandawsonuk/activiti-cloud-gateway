@@ -3,11 +3,7 @@ package org.springframework.cloud.gateway.filter.headers;
 import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
-import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -180,12 +176,6 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		return prefixAppend;
 	}
 
-	@Autowired
-	private RouteDefinitionLocator routeDefinitionLocator;
-
-	@Autowired
-	private RouteDefinitionRepository routeDefinitionRepository;
-
 	@Override
 	public HttpHeaders filter(HttpHeaders input, ServerWebExchange exchange) {
 
@@ -214,24 +204,15 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 
 		if(isPrefixEnabled()){
 
-
 			LinkedHashSet<URI> originalUris = exchange.getAttribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 			URI requestUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
 
-			System.out.println("gateway request uri "+requestUri);
-			System.out.println("gateway request uri host "+requestUri.getHost());
-			System.out.println("gateway request uri scheme "+requestUri.getScheme());
-			System.out.println("gateway request uri path "+requestUri.getPath());
-
-			for(URI originalUri : originalUris){
-				System.out.println("original uri "+originalUri);
-				System.out.println("original uri path "+originalUri.getPath());
-				System.out.println("original uri host "+originalUri.getHost());
-				System.out.println("original uri scheme "+originalUri.getScheme());
-				String prefix = originalUri.getPath().replace(requestUri.getPath(),"");
-				write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
+			if(originalUris != null && requestUri != null) {
+				originalUris.stream().forEach(originalUri -> {
+					String prefix = originalUri.getPath().replace(requestUri.getPath(), "");
+					write(updated, X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
+				});
 			}
-
 		}
 
 		if (isPortEnabled()) {

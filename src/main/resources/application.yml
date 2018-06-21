@@ -8,20 +8,7 @@ spring:
           url-expression: "'http://'+serviceId"
       x-forwarded:
         prefixEnabled: true
-# log level seems to be needed explicitly
-logging:
-  level:
-    org.springframework.cloud.gateway: INFO
-    org.springframework.cloud.loadbalancer: INFO
-server.port: 8080
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-
 # GraphQL WS Broker Configuration properties
-spring:
   activiti:
     cloud:
       services:
@@ -34,3 +21,14 @@ spring:
               security:
                 enabled: ${ACT_GRAPHQL_WS_SECURITY_ENABLED:false}
                 authorities: ${ACT_GRAPHQL_WS_SECURITY_AUTHORITIES:graphql-ws,admin}
+# log level seems to be needed explicitly
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.loadbalancer: INFO
+server.port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

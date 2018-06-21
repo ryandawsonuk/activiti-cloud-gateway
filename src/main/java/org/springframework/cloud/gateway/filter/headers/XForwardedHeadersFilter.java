@@ -3,28 +3,19 @@ package org.springframework.cloud.gateway.filter.headers;
 import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory;
-import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
-import org.springframework.cloud.gateway.route.Route;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
-import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @ConfigurationProperties("spring.cloud.gateway.x-forwarded")
 public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
@@ -221,54 +212,22 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			write(updated, X_FORWARDED_PROTO_HEADER, proto, isProtoAppend());
 		}
 
-		System.out.println("is prefix enabled? "+isPrefixEnabled());
 		if(isPrefixEnabled()){
-			Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
 
-
-			System.out.println("XForwardedHeadersFilter - route: "+route);
-
-			System.out.println("XForwardedHeadersFilter - route id: "+route.getId());
-			System.out.println("XForwardedHeadersFilter - route predicate: "+route.getPredicate());
-			System.out.println("XForwardedHeadersFilter - route uri: "+route.getUri());
-			System.out.println("XForwardedHeadersFilter - route uri path: "+route.getUri().getPath());
-			System.out.println("XForwardedHeadersFilter - route uri scheme specific part: "+route.getUri().getSchemeSpecificPart());
-			System.out.println("XForwardedHeadersFilter - route uri scheme : "+route.getUri().getScheme());
-			System.out.println("XForwardedHeadersFilter - route uri fragment : "+route.getUri().getFragment());
-
-			System.out.println("is this a path route? "+(route.getPredicate() instanceof PathRoutePredicateFactory));
-
-
-			for(GatewayFilter filter : route.getFilters()){
-				System.out.println("filter class "+filter.getClass() +" " + filter);
-				System.out.println("filter shortcut prefix "+ filter.shortcutFieldPrefix());
-				System.out.println("filter shortcutfieldorder  "+ filter.shortcutFieldOrder());
-				System.out.println("filter shortcuttype  "+ filter.shortcutType());
-			}
-
-			if (request.getHeaders().containsKey(X_FORWARDED_PREFIX_HEADER)){
-				write(updated,X_FORWARDED_PREFIX_HEADER, request.getHeaders().getFirst(X_FORWARDED_PREFIX_HEADER), isPrefixAppend());
-			}
-
-			for(String key : exchange.getAttributes().keySet()){
-				System.out.println("Exchange attribute: " + key+" - "+ (Object)exchange.getAttribute(key));
-			}
-
-			Mono<RouteDefinition> routeDefinitionMono = this.routeDefinitionLocator.getRouteDefinitions()
-					.filter(r -> r.getId().equals(route.getId()))
-					.singleOrEmpty();
-
-			RouteDefinition routeDefinition = routeDefinitionMono.blockOptional().get();
-			for (PredicateDefinition predicateDefinition :routeDefinition.getPredicates()){
-				System.out.println(predicateDefinition.toString());
-			}
 
 			LinkedHashSet<URI> originalUris = exchange.getAttribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 			URI requestUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
+
+			System.out.println("gateway request uri "+requestUri);
+			System.out.println("gateway request uri host "+requestUri.getHost());
+			System.out.println("gateway request uri scheme "+requestUri.getScheme());
 			System.out.println("gateway request uri path "+requestUri.getPath());
 
 			for(URI originalUri : originalUris){
+				System.out.println("original uri "+originalUri);
 				System.out.println("original uri path "+originalUri.getPath());
+				System.out.println("original uri host "+originalUri.getHost());
+				System.out.println("original uri scheme "+originalUri.getScheme());
 				String prefix = originalUri.getPath().replace(requestUri.getPath(),"");
 				write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
 			}

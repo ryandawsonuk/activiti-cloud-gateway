@@ -207,9 +207,25 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			LinkedHashSet<URI> originalUris = exchange.getAttribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 			URI requestUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
 
+			System.out.println("gateway request uri "+requestUri);
+			System.out.println("gateway request uri host "+requestUri.getHost());
+			System.out.println("gateway request uri scheme "+requestUri.getScheme());
+			System.out.println("gateway request uri path "+requestUri.getPath());
+
+			for(URI originalUri : originalUris){
+				System.out.println("original uri "+originalUri);
+				System.out.println("original uri path "+originalUri.getPath());
+				System.out.println("original uri host "+originalUri.getHost());
+				System.out.println("original uri scheme "+originalUri.getScheme());
+				String prefix = originalUri.getPath().replace(requestUri.getPath(),"");
+				System.out.println("prefix for loop "+prefix);
+				//write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
+			}
+
 			if(originalUris != null && requestUri != null) {
 				originalUris.stream().forEach(originalUri -> {
 					String prefix = originalUri.getPath().replace(requestUri.getPath(), "");
+					System.out.println("prefix lambda "+prefix);
 					write(updated, X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
 				});
 			}

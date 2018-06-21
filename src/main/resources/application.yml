@@ -19,3 +19,18 @@ management:
     web:
       exposure:
         include: '*'
+
+# GraphQL WS Broker Configuration properties
+spring:
+  activiti:
+    cloud:
+      services:
+        query:
+          graphql:
+            ws:
+              enabled: ${ACT_GRAPHQL_WS_ENABLED:true}
+              endpoint: ${ACT_GRAPHQL_WS_ENDPOINT:/ws/graphql}
+              allowed-origins: ${ACT_GRAPHQL_WS_ALLOWED_ORIGINS:*}
+              security:
+                enabled: ${ACT_GRAPHQL_WS_SECURITY_ENABLED:false}
+                authorities: ${ACT_GRAPHQL_WS_SECURITY_AUTHORITIES:graphql-ws,admin}

@@ -6,6 +6,8 @@ spring:
         locator:
           enabled: true
           url-expression: "'http://'+serviceId"
+      x-forwarded:
+        prefixEnabled: true
 
 server.port: 8080
 management:

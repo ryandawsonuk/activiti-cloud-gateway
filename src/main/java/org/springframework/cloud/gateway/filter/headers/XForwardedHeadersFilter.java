@@ -1,16 +1,29 @@
 package org.springframework.cloud.gateway.filter.headers;
 
+import java.net.URI;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory;
+import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.Route;
+import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
+import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR;
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @ConfigurationProperties("spring.cloud.gateway.x-forwarded")
@@ -42,8 +55,6 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 	/** X-Forwarded-Prefix Header */
 	public static final String X_FORWARDED_PREFIX_HEADER = "X-Forwarded-Prefix";
 
-	/** X-Original-URI Header */
-	public static final String X_ORIGINAL_URI = "X-Original-URI";
 
 	/** The order of the XForwardedHeadersFilter. */
 	private int order = 0;
@@ -64,7 +75,7 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 	private boolean protoEnabled = true;
 
 	/** If X-Forwarded-Prefix is enabled. */
-	private boolean prefixEnabled = true;
+	private boolean prefixEnabled = false;
 
 	/** If appending X-Forwarded-For as a list is enabled. */
 	private boolean forAppend = true;
@@ -79,7 +90,7 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 	private boolean protoAppend = true;
 
 	/** If appending X-Forwarded-Prefix as a list is enabled. */
-	private boolean prefixAppend = false;
+	private boolean prefixAppend = true;
 
 	@Override
 	public int getOrder() {
@@ -178,9 +189,14 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 		return prefixAppend;
 	}
 
+	@Autowired
+	private RouteDefinitionLocator routeDefinitionLocator;
+
+	@Autowired
+	private RouteDefinitionRepository routeDefinitionRepository;
+
 	@Override
 	public HttpHeaders filter(HttpHeaders input, ServerWebExchange exchange) {
-		Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
 
 
 		ServerHttpRequest request = exchange.getRequest();
@@ -205,11 +221,10 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			write(updated, X_FORWARDED_PROTO_HEADER, proto, isProtoAppend());
 		}
 
+		System.out.println("is prefix enabled? "+isPrefixEnabled());
 		if(isPrefixEnabled()){
-			String prefix = null;
-			if (route != null){
-				prefix = route.getId();
-			}
+			Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+
 
 			System.out.println("XForwardedHeadersFilter - route: "+route);
 
@@ -221,6 +236,9 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			System.out.println("XForwardedHeadersFilter - route uri scheme : "+route.getUri().getScheme());
 			System.out.println("XForwardedHeadersFilter - route uri fragment : "+route.getUri().getFragment());
 
+			System.out.println("is this a path route? "+(route.getPredicate() instanceof PathRoutePredicateFactory));
+
+
 			for(GatewayFilter filter : route.getFilters()){
 				System.out.println("filter class "+filter.getClass() +" " + filter);
 				System.out.println("filter shortcut prefix "+ filter.shortcutFieldPrefix());
@@ -229,14 +247,32 @@ public class XForwardedHeadersFilter implements HttpHeadersFilter, Ordered {
 			}
 
 			if (request.getHeaders().containsKey(X_FORWARDED_PREFIX_HEADER)){
-				prefix = request.getHeaders().getFirst(X_FORWARDED_PREFIX_HEADER);
+				write(updated,X_FORWARDED_PREFIX_HEADER, request.getHeaders().getFirst(X_FORWARDED_PREFIX_HEADER), isPrefixAppend());
 			}
 
 			for(String key : exchange.getAttributes().keySet()){
 				System.out.println("Exchange attribute: " + key+" - "+ (Object)exchange.getAttribute(key));
 			}
 
-			write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
+			Mono<RouteDefinition> routeDefinitionMono = this.routeDefinitionLocator.getRouteDefinitions()
+					.filter(r -> r.getId().equals(route.getId()))
+					.singleOrEmpty();
+
+			RouteDefinition routeDefinition = routeDefinitionMono.blockOptional().get();
+			for (PredicateDefinition predicateDefinition :routeDefinition.getPredicates()){
+				System.out.println(predicateDefinition.toString());
+			}
+
+			LinkedHashSet<URI> originalUris = exchange.getAttribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
+			URI requestUri = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
+			System.out.println("gateway request uri path "+requestUri.getPath());
+
+			for(URI originalUri : originalUris){
+				System.out.println("original uri path "+originalUri.getPath());
+				String prefix = originalUri.getPath().replace(requestUri.getPath(),"");
+				write(updated,X_FORWARDED_PREFIX_HEADER, prefix, isPrefixAppend());
+			}
+
 		}
 
 		if (isPortEnabled()) {

@@ -41,5 +41,6 @@ public class GatewayApplication {
                 forEach(m -> corsConfiguration.addAllowedMethod(m));
         corsConfiguration.addAllowedOrigin("*");
         routePredicateHandlerMapping.setCorsConfigurations(new HashMap<String, CorsConfiguration>() {{ put("/**", corsConfiguration); }});
-        return corsConfiguration; }
+        return corsConfiguration;
+    }
 }

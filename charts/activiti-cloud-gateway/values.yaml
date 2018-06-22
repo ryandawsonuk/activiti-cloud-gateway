@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 javaOpts:
-  xmx: 768m
+  xmx: 512m
   xms: 512m
   other: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
 image:
@@ -19,7 +19,6 @@ service:
     fabric8.io/expose: "false"
 resources:
   limits:
-    cpu: 500m
     memory: 768Mi
   requests:
     cpu: 400m

@@ -43,7 +43,6 @@ public class GatewayApplication {
         Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PATCH).
                 forEach(m -> corsConfiguration.addAllowedMethod(m));
         corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedHeader("Authorization");
         corsConfiguration.addAllowedHeader("authorization");
         corsConfiguration.addAllowedHeader("Content-Type");

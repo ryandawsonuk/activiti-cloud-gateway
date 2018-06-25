@@ -43,6 +43,10 @@ public class GatewayApplication {
         Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST).
                 forEach(m -> corsConfiguration.addAllowedMethod(m));
         corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization","Content-Type", "Cache-Control","X-Requested-With",
+                "accept","Origin","Access-Control-Request-Method","Access-Control-Request-Headers","X-CSRF-Token"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin","Access-Control-Allow-Credentials"));
         routePredicateHandlerMapping.setCorsConfigurations(new HashMap<String, CorsConfiguration>() {{ put("/**", corsConfiguration); }});
         return corsConfiguration;
     }

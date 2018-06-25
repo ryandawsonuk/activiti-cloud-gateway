@@ -40,13 +40,22 @@ public class GatewayApplication {
     @Bean
     public CorsConfiguration corsConfiguration(RoutePredicateHandlerMapping routePredicateHandlerMapping) {
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST).
+        Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PATCH).
                 forEach(m -> corsConfiguration.addAllowedMethod(m));
         corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization","Content-Type", "Cache-Control","X-Requested-With",
-                "accept","Origin","Access-Control-Request-Method","Access-Control-Request-Headers","X-CSRF-Token"));
-        corsConfiguration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin","Access-Control-Allow-Credentials"));
+        corsConfiguration.addAllowedHeader("Authorization");
+        corsConfiguration.addAllowedHeader("authorization");
+        corsConfiguration.addAllowedHeader("Content-Type");
+        corsConfiguration.addAllowedHeader("Cache-Control");
+        corsConfiguration.addAllowedHeader("X-Requested-With");
+        corsConfiguration.addAllowedHeader("acccept");
+        corsConfiguration.addAllowedHeader("Origin");
+        corsConfiguration.addAllowedHeader("Access-Control-Request-Method");
+        corsConfiguration.addAllowedHeader("Access-Control-Request-Headers");
+        corsConfiguration.addAllowedHeader("X-CSRF-Token");
+        corsConfiguration.addExposedHeader("Access-Control-Allow-Origin");
+        corsConfiguration.addExposedHeader("Access-Control-Allow-Credentials");
         routePredicateHandlerMapping.setCorsConfigurations(new HashMap<String, CorsConfiguration>() {{ put("/**", corsConfiguration); }});
         return corsConfiguration;
     }

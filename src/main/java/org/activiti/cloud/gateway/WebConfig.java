@@ -15,7 +15,7 @@ public class WebConfig implements WebFluxConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*")
-                .allowedHeaders("Authorization","Content-Type","Cache-Control","X-Requested-With",
+                .allowedHeaders("Authorization","authorization","Content-Type","Cache-Control","X-Requested-With",
                         "accept","Origin","Access-Control-Request-Method","Access-Control-Request-Headers","X-CSRF-Token")
                 .exposedHeaders("Access-Control-Allow-Origin","Access-Control-Allow-Credentials")
                 .allowCredentials(true).maxAge(3600);

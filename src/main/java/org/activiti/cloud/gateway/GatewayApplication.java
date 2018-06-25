@@ -35,7 +35,10 @@ public class GatewayApplication {
                 properties);
     }
 
-    @Bean public CorsConfiguration corsConfiguration(RoutePredicateHandlerMapping routePredicateHandlerMapping) {
+    // see https://github.com/spring-cloud/spring-cloud-gateway/issues/229
+    // adding below configuration alone doesn't seem to be enough and also need RoutePredicateHandlerMapping
+    @Bean
+    public CorsConfiguration corsConfiguration(RoutePredicateHandlerMapping routePredicateHandlerMapping) {
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST).
                 forEach(m -> corsConfiguration.addAllowedMethod(m));

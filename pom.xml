@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.activiti.cloud</groupId>
       <artifactId>activiti-cloud-services-query-graphql-ws-security</artifactId>
-    </dependency>c
+    </dependency>
   </dependencies>
   <build>
     <plugins>

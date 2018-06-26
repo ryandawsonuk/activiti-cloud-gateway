@@ -38,14 +38,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud</groupId>
-        <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud</groupId>
-        <artifactId>activiti-cloud-services-query-graphql-ws-security</artifactId>
-      </dependency>
 		</dependencies>
 	</dependencyManagement>
   <dependencies>
@@ -73,6 +65,14 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-kubernetes-ribbon</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud</groupId>
+      <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud</groupId>
+      <artifactId>activiti-cloud-services-query-graphql-ws-security</artifactId>
+    </dependency>c
   </dependencies>
   <build>
     <plugins>

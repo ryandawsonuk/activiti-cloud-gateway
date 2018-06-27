@@ -9,15 +9,15 @@ spring:
       x-forwarded:
         prefixEnabled: true
 # GraphQL WS Broker Configuration properties
-  activiti:
-    cloud:
-      services:
-        query:
-          graphql:
-            ws:
-              enabled: ${ACT_GRAPHQL_WS_ENABLED:true}
-              endpoint: ${ACT_GRAPHQL_WS_ENDPOINT:/ws/graphql}
-              allowed-origins: ${ACT_GRAPHQL_WS_ALLOWED_ORIGINS:*}
+#  activiti:
+#    cloud:
+#      services:
+#        query:
+#          graphql:
+#            ws:
+#              enabled: ${ACT_GRAPHQL_WS_ENABLED:true}
+#              endpoint: ${ACT_GRAPHQL_WS_ENDPOINT:/ws/graphql}
+#              allowed-origins: ${ACT_GRAPHQL_WS_ALLOWED_ORIGINS:*}
 # having to take security out even from classpath as netty not happy
 #              security:
 #                enabled: ${ACT_GRAPHQL_WS_SECURITY_ENABLED:false}

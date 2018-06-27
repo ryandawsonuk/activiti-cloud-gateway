@@ -70,6 +70,23 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-kubernetes-ribbon</artifactId>
     </dependency>
+    <!--
+    <dependency>
+      <groupId>org.activiti.cloud</groupId>
+      <artifactId>activiti-cloud-app-service</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+    -->
+    <!--
     <dependency>
       <groupId>org.activiti.cloud</groupId>
       <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
@@ -96,6 +113,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+    -->
   </dependencies>
   <build>
     <plugins>
